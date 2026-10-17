@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rent vs Buy</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="page-head">
+    <h1>Rent vs Buy</h1>
+    <p>How long do you need to stay for buying to beat renting?</p>
+  </header>
+
+  <main class="layout">
+    <form id="inputs" class="panel" autocomplete="off" onsubmit="return false">
+      <fieldset>
+        <legend>The home</legend>
+        <label>Price <span class="field"><i>£</i><input name="price" type="number" min="0" step="5000"></span></label>
+        <label>Deposit <span class="field"><input name="depositPct" type="number" min="0" max="100" step="1"><i>%</i></span></label>
+        <label>Mortgage rate <span class="field"><input name="mortgageRate" type="number" min="0" step="0.1"><i>% / yr</i></span></label>
+        <label>Mortgage term <span class="field"><input name="mortgageTerm" type="number" min="1" max="40" step="1"><i>years</i></span></label>
+        <label>Running costs <span class="field"><i>£</i><input name="ownershipCosts" type="number" min="0" step="100"><i>/ yr</i></span></label>
+        <p class="hint">Maintenance, insurance, service charge.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Renting instead</legend>
+        <label>Rent <span class="field"><i>£</i><input name="rent" type="number" min="0" step="50"><i>/ month</i></span></label>
+        <label>Rent increase <span class="field"><input name="rentGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>One-off costs</legend>
+        <label>Buying <span class="field"><i>£</i><input name="buyingCosts" type="number" min="0" step="500"></span></label>
+        <p class="hint">Stamp duty, solicitor, survey, mortgage fees.</p>
+        <label>Selling <span class="field"><i>£</i><input name="sellingCosts" type="number" min="0" step="500"></span></label>
+        <p class="hint">Estate agent, solicitor.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>The future</legend>
+        <label>House prices <span class="field"><input name="houseGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
+        <label>Investment return <span class="field"><input name="investReturn" type="number" step="0.5"><i>% / yr</i></span></label>
+        <label>You plan to stay <span class="field"><input name="plannedStay" type="number" min="0" step="1"><i>years</i></span></label>
+        <label>Chart length <span class="field"><input name="horizon" type="number" min="1" max="50" step="1"><i>years</i></span></label>
+      </fieldset>
+
+      <button type="button" id="reset">Reset</button>
+    </form>
+
+    <section class="results">
+      <div class="panel verdict">
+        <h2 id="verdict"></h2>
+        <p id="verdict-detail"></p>
+        <p id="verdict-range" class="muted"></p>
+        <dl class="stats">
+          <div><dt>Mortgage payment</dt><dd id="stat-payment"></dd></div>
+          <div><dt>Cash needed up front</dt><dd id="stat-cash"></dd></div>
+          <div><dt>Fees to win back</dt><dd id="stat-hole"></dd></div>
+        </dl>
+      </div>
+
+      <figure class="panel">
+        <figcaption>
+          <h3>Payoff from buying instead of renting</h3>
+          <p>How much better off buying leaves you, depending on when you sell. Above £0, buying wins; in the red zone, renting wins. The grey band shows house prices growing 2 points a year faster or slower.</p>
+        </figcaption>
+        <div id="payoff-chart" class="chart"></div>
+      </figure>
+
+      <figure class="panel">
+        <figcaption>
+          <h3>What you walk away with</h3>
+          <p>Buying: home value minus mortgage left minus selling costs, plus anything invested. Renting: investments.</p>
+          <ul class="legend">
+            <li><span class="key s-buy"></span>Buying</li>
+            <li><span class="key s-rent"></span>Renting</li>
+          </ul>
+        </figcaption>
+        <div id="worth-chart" class="chart"></div>
+      </figure>
+
+      <details class="panel">
+        <summary>Year-by-year table</summary>
+        <div class="table-wrap">
+          <table id="year-table">
+            <thead><tr><th>Year</th><th>Home value</th><th>Mortgage left</th><th>Buying net</th><th>Renting net</th><th>Buying advantage</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+
+      <details class="panel">
+        <summary>How it works</summary>
+        <ul class="method">
+          <li>You start with the same cash either way: the deposit plus buying costs. A buyer spends it on the house; a renter invests it.</li>
+          <li>Each month, both spend the same. A buyer pays the mortgage plus running costs, and a renter pays rent. Whoever's month is cheaper invests the difference.</li>
+          <li>Selling at any point: buyers get the home's value minus the mortgage left and selling costs, plus their investments. Renters have their investments.</li>
+          <li>Not included: tax on investment gains (assumes an ISA), inflation (figures are in future pounds), and moving more than once.</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+
+  <script src="src/model.js"></script>
+  <script src="src/chart.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
