@@ -14,6 +14,11 @@
   --band: #898781;
   --stay: #52514e;
   --input-bg: #ffffff;
+  --stay1: #86b6ef;
+  --stay2: #5598e7;
+  --stay3: #2a78d6;
+  --stay4: #1c5cab;
+  --stay5: #104281;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -30,6 +35,11 @@
       --neg: #e66767;
     --stay: #c3c2b7;
     --input-bg: #232322;
+    --stay1: #184f95;
+    --stay2: #256abf;
+    --stay3: #3987e5;
+    --stay4: #6da7ec;
+    --stay5: #9ec5f4;
   }
 }
 :root[data-theme="dark"] {
@@ -46,6 +56,11 @@
   --neg: #e66767;
   --stay: #c3c2b7;
   --input-bg: #232322;
+  --stay1: #184f95;
+  --stay2: #256abf;
+  --stay3: #3987e5;
+  --stay4: #6da7ec;
+  --stay5: #9ec5f4;
 }
 
 * { box-sizing: border-box; }
@@ -111,6 +126,7 @@ label {
 .stats { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 16px 0 0; }
 .stats dt { color: var(--muted); font-size: 13px; }
 .stats dd { margin: 0; font-size: 18px; font-weight: 600; }
+.stats dd.sub { font-size: 13px; font-weight: 400; color: var(--text-secondary); }
 
 /* Charts */
 figcaption h3 { font-size: 16px; }
@@ -124,7 +140,8 @@ figcaption p { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
 .line.s-payoff { stroke: var(--text-primary); }
 .line.s-buy { stroke: var(--buy); }
 .line.s-rent { stroke: var(--rent); }
-.fill-neg { fill: var(--neg); opacity: 0.14; }
+.fill-neg { fill: var(--neg); opacity: 0.08; }
+.zone-label { fill: var(--muted); font-size: 12px; }
 .band { fill: var(--band); opacity: 0.16; }
 .marker { stroke: var(--stay); stroke-width: 1; }
 .marker.even { stroke: var(--muted); }
@@ -137,8 +154,8 @@ figcaption p { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
 .hit { fill: transparent; cursor: crosshair; outline: none; }
 .hit:focus-visible { stroke: var(--buy); stroke-width: 2; }
 
-.legend { list-style: none; display: flex; gap: 16px; padding: 0; margin: 8px 0 0; font-size: 14px; color: var(--text-secondary); }
-.legend li { display: flex; align-items: center; gap: 6px; }
+.legend { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 0; margin: 8px 0 0; font-size: 14px; color: var(--text-secondary); }
+.legend li { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .key { display: inline-block; width: 14px; height: 2px; border-radius: 1px; }
 .key.s-buy { background: var(--buy); }
 .key.s-rent { background: var(--rent); }
@@ -168,3 +185,36 @@ th { color: var(--muted); font-weight: 500; }
 tr.hl td { font-weight: 600; }
 .method { margin: 12px 0 0; padding-left: 20px; color: var(--text-secondary); }
 .method li { margin: 4px 0; }
+
+/* Sliders and ranges */
+label.slider { display: block; margin: 10px 0; }
+label.slider .row { display: flex; justify-content: space-between; }
+label.slider output { color: var(--text-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; margin: 6px 0 0; accent-color: var(--buy); }
+.range-row { flex-wrap: wrap; }
+.pair { display: flex; align-items: center; gap: 6px; color: var(--muted); width: 100%; }
+.pair .field { flex: 1; min-width: 0; }
+.pair .field input { width: 100%; }
+
+/* One line per length of stay, light (short) to dark (long) */
+.line.s-stay1 { stroke: var(--stay1); }
+.dot.s-stay1 { fill: var(--stay1); }
+.key.s-stay1, .tt-key.s-stay1 { background: var(--stay1); }
+.line.s-stay2 { stroke: var(--stay2); }
+.dot.s-stay2 { fill: var(--stay2); }
+.key.s-stay2, .tt-key.s-stay2 { background: var(--stay2); }
+.line.s-stay3 { stroke: var(--stay3); }
+.dot.s-stay3 { fill: var(--stay3); }
+.key.s-stay3, .tt-key.s-stay3 { background: var(--stay3); }
+.line.s-stay4 { stroke: var(--stay4); }
+.dot.s-stay4 { fill: var(--stay4); }
+.key.s-stay4, .tt-key.s-stay4 { background: var(--stay4); }
+.line.s-stay5 { stroke: var(--stay5); }
+.dot.s-stay5 { fill: var(--stay5); }
+.key.s-stay5, .tt-key.s-stay5 { background: var(--stay5); }
+
+#max-table { margin-top: 4px; }
+#max-table td:last-child, #max-table th:last-child { text-align: right; }
+.results > .panel > h3 { font-size: 16px; }
+.results > .panel > .muted { margin-top: 4px; }
+code { font-size: 13px; }
