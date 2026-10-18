@@ -2,7 +2,7 @@
 // away, and fall back to the cached copy when offline. 'no-cache' makes every
 // request check with the server, so the browser's HTTP cache (GitHub Pages
 // allows 10 minutes) can't hand back an old script next to a new page.
-const CACHE = 'rent-vs-buy-v3';
+const CACHE = 'rent-vs-buy-v4';
 const FILES = [
   './', 'index.html', 'styles.css', 'manifest.webmanifest',
   'src/model.js', 'src/chart.js', 'src/app.js', 'src/shell.js',

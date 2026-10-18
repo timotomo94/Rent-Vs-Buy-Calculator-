@@ -241,6 +241,34 @@
       }
       tbody.appendChild(tr);
     }
+
+    // Mortgage repayments and equity, year by year over the same years as the map
+    const er = base.rows;
+    const growth = er[p.stayMax * 12].homeValue - p.price;
+    const atEnd = er[p.stayMax * 12];
+    document.getElementById('equity-sub').textContent =
+      `${gbp(p.price)} home, ${gbp(base.deposit)} deposit, ${gbp(base.loan)} mortgage at ${p.mortgageRate.toFixed(2)}% over ${years(p.mortgageTerm)} ` +
+      `(${gbp(base.payment)} a month). Equity is the home's value minus the mortgage left, before selling costs. Shaded rows are your stay.`;
+    document.getElementById('equity-summary').textContent =
+      `After ${years(p.stayMax)}: ${gbp(atEnd.homeValue - atEnd.balance)} equity = ${gbp(base.deposit)} deposit + ` +
+      `${gbp(base.loan - atEnd.balance)} loan repaid` + (growth ? ` ${growth > 0 ? '+' : '−'} ${gbp(Math.abs(growth))} price change` : '') +
+      `. You'd have paid ${gbp(atEnd.mortgagePaid)} to the lender, ${gbp(atEnd.interestPaid)} of it interest.`;
+    const etbody = document.querySelector('#equity-table tbody');
+    etbody.textContent = '';
+    for (let y = 1; y <= p.chartYears; y++) {
+      const r = er[y * 12], prev = er[(y - 1) * 12];
+      const paid = r.mortgagePaid - prev.mortgagePaid;
+      const interest = r.interestPaid - prev.interestPaid;
+      const equity = r.homeValue - r.balance;
+      const tr = document.createElement('tr');
+      if (y >= p.stayMin && y <= p.stayMax) tr.className = 'in-stay';
+      for (const v of [y, gbp(equity), Math.round((100 * equity) / r.homeValue) + '%', gbp(paid - interest), gbp(interest), gbp(r.balance), gbp(paid)]) {
+        const td = document.createElement('td');
+        td.textContent = v;
+        tr.appendChild(td);
+      }
+      etbody.appendChild(tr);
+    }
   }
 
   writeInputs(fromURL());
