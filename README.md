@@ -18,7 +18,7 @@ You set the home you're looking at with three sliders: price, deposit and length
 ## The model
 
 - Both scenarios start with the same cash: the deposit plus buying costs. The buyer spends it on the house, and the renter invests it.
-- Each month, both spend the same. The buyer pays the mortgage plus running costs (a % of price), and the renter pays rent. Whoever's month is cheaper invests the difference.
+- Each month, both have the same budget: rent plus monthly savings (£1,000 by default). The renter pays rent and invests the savings. The buyer pays the mortgage plus running costs (a % of price) and invests what's left. The savings are equal on both sides, so they change how much each ends up with but not who wins.
 - At sale, the buyer gets home value minus the mortgage left and selling costs, plus their investments. The renter has their investments.
 - Break-even is the first month from which buying stays ahead.
 - The mortgage rate is an input and is assumed to stay the same for the whole stay.

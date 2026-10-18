@@ -1,9 +1,10 @@
 // Rent vs buy model.
 //
-// Both scenarios start with the same cash (deposit + buying costs) and spend the
-// same amount every month. The renter invests the cash the buyer would have put
-// into the house; whoever has the cheaper month invests the difference. Net worth
-// is what you'd walk away with if you sold / stopped at that point.
+// Both scenarios start with the same cash (deposit + buying costs) and have the
+// same monthly budget: rent plus monthly savings. The renter invests the cash the
+// buyer would have put into the house, plus the savings each month; the buyer
+// invests whatever is left after the mortgage and running costs. Net worth is
+// what you'd walk away with if you sold / stopped at that point.
 (function (root) {
   'use strict';
 
@@ -18,6 +19,7 @@
     mortgageTerm: 35,     // years
     runningCostPct: 1,    // % of price per year: maintenance, insurance, service charge
     rent: 2025,           // £ per month
+    monthlySaving: 1000,  // £ per month the renter puts aside on top of rent
     rentGrowth: 4,        // % per year, applied once a year
     investReturn: 7,      // % per year, compounded monthly
     houseGrowth: 0,       // % per year
@@ -89,16 +91,17 @@
       const owningOut = mortgageOut + running;
       const rentOut = p.rent * Math.pow(1 + p.rentGrowth / 100, Math.floor(m / 12));
 
-      const diff = owningOut - rentOut;
-      if (diff > 0) renterPot += diff;
-      else buyerPot -= diff;
+      // Same budget either way. The buyer's savings go negative if owning costs
+      // more than rent + savings (they'd be drawing on savings).
+      renterPot += p.monthlySaving;
+      buyerPot += rentOut + p.monthlySaving - owningOut;
 
       owningPaid += owningOut;
       rentPaid += rentOut;
       snapshot(m + 1);
     }
 
-    return { deposit, loan, payment, running, rows, breakevenMonth: breakeven(rows) };
+    return { deposit, loan, payment, running, buyerSaving: p.rent + p.monthlySaving - payment - running, rows, breakevenMonth: breakeven(rows) };
   }
 
   // First month from which buying stays ahead for the rest of the rows,

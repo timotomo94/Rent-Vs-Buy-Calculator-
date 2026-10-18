@@ -105,6 +105,10 @@
     document.getElementById('stat-owning').textContent = gbp(owning) + ' / month';
     document.getElementById('stat-owning-split').textContent = `mortgage ${gbp(base.payment)} + running ${gbp(base.running)}`;
     document.getElementById('stat-rent').textContent = gbp(p.rent) + ' / month';
+    document.getElementById('stat-saving').textContent = `buying ${gbp(base.buyerSaving)} · renting ${gbp(p.monthlySaving)}`;
+    document.getElementById('stat-saving-split').textContent = base.buyerSaving < 0
+      ? 'owning costs more than rent + savings: the buyer draws on savings'
+      : 'year 1; rent − cost of owning + savings';
     document.getElementById('stat-ltv').textContent = Math.round(ltv) + '%';
     document.getElementById('stat-cash').textContent = gbp(base.deposit + p.buyingCosts);
 

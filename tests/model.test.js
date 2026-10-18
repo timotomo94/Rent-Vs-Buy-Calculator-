@@ -19,6 +19,19 @@ test('running costs are a percentage of the price', () => {
   assert.strictEqual(s.running, 4000 / 12);
 });
 
+test('monthly savings change both net worths equally, not the payoff', () => {
+  const a = simulate(params({ monthlySaving: 0 }), 5).rows[60];
+  const b = simulate(params({ monthlySaving: 1000 }), 5).rows[60];
+  assert.ok(b.rentNet - a.rentNet > 60000);
+  assert.ok(Math.abs((b.buyNet - a.buyNet) - (b.rentNet - a.rentNet)) < 1e-6);
+  assert.ok(Math.abs(b.payoff - a.payoff) < 1e-6);
+});
+
+test('buyer saves rent minus cost of owning plus savings', () => {
+  const s = simulate(params({ rent: 2000, monthlySaving: 1000 }), 1);
+  assert.ok(Math.abs(s.buyerSaving - (3000 - s.payment - s.running)) < 1e-9);
+});
+
 test('mortgage is paid off at the end of the term', () => {
   const s = simulate(params({ mortgageTerm: 25 }), 30);
   assert.ok(s.rows[25 * 12].balance < 1e-6);
