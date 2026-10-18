@@ -51,12 +51,12 @@
   //   series: [{label, values, cls}] (null = off the chart), band: {lo, hi},
   //   polarity: bool (shade below zero), fillBelow: bool (shade under the first series),
   //   hBand: {lo, hi, label} (horizontal strip),
-  //   markers: [{x, label, cls, row}], snap: [index] (hover positions, default all),
+  //   markers: [{x, label, cls, row, bottom}], snap: [index] (hover positions, default all),
   //   tooltip(index) -> {title, rows: [{label, value, cls}]}, focusIndex, ariaLabel }
   function render(container, opts) {
     container.textContent = '';
     const width = Math.max(280, container.clientWidth);
-    const height = width < 520 ? 280 : 360;
+    const height = width < 520 ? 250 : 360;
     const w = width - M.left - M.right;
     const h = height - M.top - M.bottom;
 
@@ -119,7 +119,7 @@
     if (opts.hBand) {
       const top = y(opts.hBand.hi), bottom = y(opts.hBand.lo);
       el('rect', { x: M.left, y: top, width: w, height: Math.max(1, bottom - top), class: 'h-band' }, svg);
-      const lab = el('text', { x: M.left + 8, y: top + 14, class: 'marker-label' }, svg);
+      const lab = el('text', { x: M.left + w - 8, y: top + 14, class: 'marker-label', 'text-anchor': 'end' }, svg);
       lab.textContent = opts.hBand.label;
     }
 
@@ -127,7 +127,8 @@
       if (m.x == null || m.x < xMin || m.x > xMax) continue;
       el('line', { x1: x(m.x), x2: x(m.x), y1: M.top, y2: M.top + h, class: 'marker ' + (m.cls || '') }, svg);
       const flip = x(m.x) > M.left + w * 0.75;
-      const lab = el('text', { x: x(m.x) + (flip ? -6 : 6), y: M.top + 12 + (m.row || 0) * 16, class: 'marker-label', 'text-anchor': flip ? 'end' : 'start' }, svg);
+      const ly = m.bottom ? M.top + h - 6 - (m.row || 0) * 16 : M.top + 12 + (m.row || 0) * 16;
+      const lab = el('text', { x: x(m.x) + (flip ? -6 : 6), y: ly, class: 'marker-label', 'text-anchor': flip ? 'end' : 'start' }, svg);
       lab.textContent = m.label;
     }
 

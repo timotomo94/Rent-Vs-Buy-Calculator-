@@ -19,7 +19,8 @@
   }
 
   const form = document.getElementById('inputs');
-  const fields = Array.from(form.querySelectorAll('input[name]'));
+  // form.elements includes the sliders that live outside the form (form="inputs").
+  const fields = Array.from(form.elements).filter((el) => el.tagName === 'INPUT' && el.name);
   const field = (name) => form.elements[name];
   const SLIDERS = { price: ['priceMin', 'priceMax'], deposit: ['depositMin', 'depositMax'], stay: ['stayMin', 'stayMax'] };
 
@@ -105,10 +106,11 @@
     document.getElementById('stat-owning').textContent = gbp(owning) + ' / month';
     document.getElementById('stat-owning-split').textContent = `mortgage ${gbp(base.payment)} + running ${gbp(base.running)}`;
     document.getElementById('stat-rent').textContent = gbp(p.rent) + ' / month';
-    document.getElementById('stat-saving').textContent = `buying ${gbp(base.buyerSaving)} · renting ${gbp(p.monthlySaving)}`;
+    document.getElementById('stat-saving-buy').textContent = gbp(base.buyerSaving) + ' / month';
     document.getElementById('stat-saving-split').textContent = base.buyerSaving < 0
-      ? 'owning costs more than rent + savings: the buyer draws on savings'
-      : 'year 1; rent − cost of owning + savings';
+      ? 'owning costs more than rent + savings'
+      : 'rent − owning + savings';
+    document.getElementById('stat-saving-rent').textContent = gbp(p.monthlySaving) + ' / month';
     document.getElementById('stat-ltv').textContent = Math.round(ltv) + '%';
     document.getElementById('stat-cash').textContent = gbp(base.deposit + p.buyingCosts);
 
@@ -122,9 +124,8 @@
     const cap = (v) => (v == null ? p.chartYears : v);
 
     document.getElementById('breakeven-sub').textContent =
-      `How long you'd need to stay before buying beats renting, with a ${gbp(p.deposit)} deposit. ` +
-      `The grey band covers deposits from ${gbp(p.depositMin)} to ${gbp(p.depositMax)}. ` +
-      `Where the line runs through or below your stay, buying works.`;
+      `With a ${kGBP(p.deposit)} deposit (grey: ${kGBP(p.depositMin)}–${kGBP(p.depositMax)}). ` +
+      'Buying works where the line runs through or below your stay.';
 
     const tickStep = p.priceMax - p.priceMin > 400000 ? 100000 : 50000;
     const xTicks = [];
@@ -141,7 +142,7 @@
       band: { lo: depLo.map((v, i) => Math.min(cap(v), cap(depHi[i]))), hi: depLo.map((v, i) => Math.max(cap(v), cap(depHi[i]))) },
       fillBelow: true,
       hBand: { lo: p.stayMin, hi: p.stayMax, label: p.stayMin === p.stayMax ? `Your stay: ${years(p.stayMin)}` : `Your stay: ${p.stayMin}–${p.stayMax} years` },
-      markers: [{ x: p.price, label: 'Your home', cls: 'stay' }],
+      markers: [{ x: p.price, label: 'Your home', cls: 'stay', bottom: true }],
       focusX: p.price,
       ariaLabel: 'Years needed to break even by house price',
       tooltip: (i) => ({
@@ -224,7 +225,7 @@
   }
 
   writeInputs(fromURL());
-  form.addEventListener('input', update);
+  document.addEventListener('input', (e) => { if (e.target.form === form) update(); });
   document.getElementById('reset').addEventListener('click', () => { writeInputs(DEFAULTS); update(); });
   let t;
   window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(update, 100); });

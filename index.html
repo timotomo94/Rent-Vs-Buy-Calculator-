@@ -2,92 +2,122 @@
 <html lang="en-GB">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Rent vs Buy</title>
+  <meta name="theme-color" content="#fcfcfb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1a1a19" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rent vs Buy">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="page-head">
-    <h1>Rent vs Buy</h1>
-    <p>How long would you need to stay for buying to beat renting, at each house price?</p>
+  <header class="app-bar">
+    <button type="button" id="open-drawer" class="icon-btn" aria-controls="drawer" aria-expanded="false">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      <span>Inputs</span>
+    </button>
+    <div class="titles">
+      <h1>Rent vs Buy</h1>
+      <p>How long would you need to stay for buying to beat renting, at each house price?</p>
+    </div>
   </header>
 
+  <div id="backdrop" class="backdrop" hidden></div>
+
   <main class="layout">
-    <form id="inputs" class="panel" autocomplete="off" onsubmit="return false">
-      <fieldset>
-        <legend>The home you're looking at</legend>
+    <div class="side">
+      <div id="quick" class="panel quick">
         <label class="slider">
           <span class="row"><span>Price</span><output id="out-price"></output></span>
-          <input name="price" type="range" step="5000">
+          <input name="price" type="range" step="5000" form="inputs">
         </label>
         <label class="slider">
           <span class="row"><span>Deposit</span><output id="out-deposit"></output></span>
-          <input name="deposit" type="range" step="5000">
+          <input name="deposit" type="range" step="5000" form="inputs">
         </label>
         <label class="slider">
           <span class="row"><span>You stay for</span><output id="out-stay"></output></span>
-          <input name="stay" type="range" step="1">
+          <input name="stay" type="range" step="1" form="inputs">
         </label>
-      </fieldset>
+      </div>
 
-      <fieldset>
-        <legend>Ranges you're considering</legend>
-        <label class="range-row">Price <span class="pair"><span class="field"><i>£</i><input name="priceMin" type="number" min="0" step="10000"></span>–<span class="field"><i>£</i><input name="priceMax" type="number" min="0" step="10000"></span></span></label>
-        <label class="range-row">Deposit <span class="pair"><span class="field"><i>£</i><input name="depositMin" type="number" min="0" step="5000"></span>–<span class="field"><i>£</i><input name="depositMax" type="number" min="0" step="5000"></span></span></label>
-        <label class="range-row">Stay <span class="pair"><span class="field"><input name="stayMin" type="number" min="1" max="40" step="1"><i>y</i></span>–<span class="field"><input name="stayMax" type="number" min="1" max="40" step="1"><i>y</i></span></span></label>
-        <label>Chart up to <span class="field"><input name="chartYears" type="number" min="1" max="40" step="1"><i>years</i></span></label>
-      </fieldset>
+      <aside id="drawer" class="panel drawer" aria-label="Inputs">
+        <div class="drawer-head">
+          <h2>Inputs</h2>
+          <button type="button" id="close-drawer" class="icon-btn" aria-label="Close inputs">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+          </button>
+        </div>
+      <form id="inputs" autocomplete="off" onsubmit="return false">
+        <fieldset>
+          <legend>Ranges you're considering</legend>
+          <label class="range-row">Price <span class="pair"><span class="field"><i>£</i><input name="priceMin" type="number" min="0" step="10000"></span>–<span class="field"><i>£</i><input name="priceMax" type="number" min="0" step="10000"></span></span></label>
+          <label class="range-row">Deposit <span class="pair"><span class="field"><i>£</i><input name="depositMin" type="number" min="0" step="5000"></span>–<span class="field"><i>£</i><input name="depositMax" type="number" min="0" step="5000"></span></span></label>
+          <label class="range-row">Stay <span class="pair"><span class="field"><input name="stayMin" type="number" min="1" max="40" step="1"><i>y</i></span>–<span class="field"><input name="stayMax" type="number" min="1" max="40" step="1"><i>y</i></span></span></label>
+          <label>Chart up to <span class="field"><input name="chartYears" type="number" min="1" max="40" step="1"><i>years</i></span></label>
+        </fieldset>
 
-      <fieldset>
-        <legend>Monthly costs</legend>
-        <label>Mortgage rate <span class="field"><input name="mortgageRate" type="number" min="0" step="0.05"><i>% / yr</i></span></label>
-        <p class="hint">Best 2-year fixes in Oct 2026: about 4.9% (60% loan-to-value) to 5.3% (90%).</p>
-        <label>Mortgage term <span class="field"><input name="mortgageTerm" type="number" min="1" max="40" step="1"><i>years</i></span></label>
-        <label>Running costs <span class="field"><input name="runningCostPct" type="number" min="0" step="0.1"><i>% of price / yr</i></span></label>
-        <p class="hint">Maintenance, insurance, service charge.</p>
-        <label>Rent <span class="field"><i>£</i><input name="rent" type="number" min="0" step="25"><i>/ month</i></span></label>
-        <label>Rent increase <span class="field"><input name="rentGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
-        <label>Monthly savings <span class="field"><i>£</i><input name="monthlySaving" type="number" min="0" step="100"><i>/ month</i></span></label>
-        <p class="hint">What you'd save as a renter. A buyer has the same budget, so saves rent − cost of owning + this.</p>
-      </fieldset>
+        <fieldset>
+          <legend>Monthly costs</legend>
+          <label>Mortgage rate <span class="field"><input name="mortgageRate" type="number" min="0" step="0.05"><i>% / yr</i></span></label>
+          <p class="hint">Best 2-year fixes in Oct 2026: about 4.9% (60% loan-to-value) to 5.3% (90%).</p>
+          <label>Mortgage term <span class="field"><input name="mortgageTerm" type="number" min="1" max="40" step="1"><i>years</i></span></label>
+          <label>Running costs <span class="field"><input name="runningCostPct" type="number" min="0" step="0.1"><i>% of price / yr</i></span></label>
+          <p class="hint">Maintenance, insurance, service charge.</p>
+          <label>Rent <span class="field"><i>£</i><input name="rent" type="number" min="0" step="25"><i>/ month</i></span></label>
+          <label>Rent increase <span class="field"><input name="rentGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
+          <label>Monthly savings <span class="field"><i>£</i><input name="monthlySaving" type="number" min="0" step="100"><i>/ month</i></span></label>
+          <p class="hint">What you'd save as a renter. A buyer has the same budget, so saves rent − cost of owning + this.</p>
+        </fieldset>
 
-      <fieldset>
-        <legend>One-off costs</legend>
-        <label>Buying <span class="field"><i>£</i><input name="buyingCosts" type="number" min="0" step="500"></span></label>
-        <p class="hint">Stamp duty, solicitor, survey, mortgage fees.</p>
-        <label>Selling <span class="field"><i>£</i><input name="sellingCosts" type="number" min="0" step="500"></span></label>
-        <p class="hint">Estate agent, solicitor.</p>
-      </fieldset>
+        <fieldset>
+          <legend>One-off costs</legend>
+          <label>Buying <span class="field"><i>£</i><input name="buyingCosts" type="number" min="0" step="500"></span></label>
+          <p class="hint">Stamp duty, solicitor, survey, mortgage fees.</p>
+          <label>Selling <span class="field"><i>£</i><input name="sellingCosts" type="number" min="0" step="500"></span></label>
+          <p class="hint">Estate agent, solicitor.</p>
+        </fieldset>
 
-      <fieldset>
-        <legend>The future</legend>
-        <label>House prices <span class="field"><input name="houseGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
-        <label>Investment return <span class="field"><input name="investReturn" type="number" step="0.5"><i>% / yr</i></span></label>
-      </fieldset>
+        <fieldset>
+          <legend>The future</legend>
+          <label>House prices <span class="field"><input name="houseGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
+          <label>Investment return <span class="field"><input name="investReturn" type="number" step="0.5"><i>% / yr</i></span></label>
+        </fieldset>
 
-      <button type="button" id="reset">Reset</button>
-    </form>
+        <button type="button" id="reset">Reset</button>
+      </form>
+      </aside>
+    </div>
 
     <section class="results">
       <div class="panel verdict">
         <h2 id="verdict"></h2>
         <p id="verdict-detail"></p>
-        <dl class="stats">
-          <div><dt>Cost of owning</dt><dd id="stat-owning"></dd><dd class="sub" id="stat-owning-split"></dd></div>
-          <div><dt>Rent</dt><dd id="stat-rent"></dd><dd class="sub">per month, year 1</dd></div>
-          <div><dt>Saving each month</dt><dd id="stat-saving"></dd><dd class="sub" id="stat-saving-split"></dd></div>
-          <div><dt>Loan-to-value</dt><dd id="stat-ltv"></dd><dd class="sub">loan ÷ price</dd></div>
-          <div><dt>Cash up front</dt><dd id="stat-cash"></dd><dd class="sub">deposit + buying costs</dd></div>
-        </dl>
       </div>
 
       <figure class="panel">
         <figcaption>
-          <h3>Years needed to break even</h3>
+          <h3>Years you'd need to stay to break even</h3>
           <p id="breakeven-sub"></p>
         </figcaption>
         <div id="breakeven-chart" class="chart"></div>
       </figure>
+
+      <div class="panel">
+        <h3>Your home in numbers</h3>
+        <dl class="stats">
+          <div><dt>Cost of owning</dt><dd id="stat-owning"></dd><dd class="sub" id="stat-owning-split"></dd></div>
+          <div><dt>Rent</dt><dd id="stat-rent"></dd><dd class="sub">per month, year 1</dd></div>
+          <div><dt>Buyer saves</dt><dd id="stat-saving-buy"></dd><dd class="sub" id="stat-saving-split"></dd></div>
+          <div><dt>Renter saves</dt><dd id="stat-saving-rent"></dd><dd class="sub">per month</dd></div>
+          <div><dt>Loan-to-value</dt><dd id="stat-ltv"></dd><dd class="sub">loan ÷ price</dd></div>
+          <div><dt>Cash up front</dt><dd id="stat-cash"></dd><dd class="sub">deposit + buying costs</dd></div>
+        </dl>
+      </div>
 
       <div class="panel">
         <h3>Most you should pay</h3>
@@ -135,5 +165,6 @@
   <script src="src/model.js"></script>
   <script src="src/chart.js"></script>
   <script src="src/app.js"></script>
+  <script src="src/shell.js"></script>
 </body>
 </html>

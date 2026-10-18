@@ -4,6 +4,17 @@ A UK rent-vs-buy calculator built around one question: **how long do you need to
 
 Open `index.html` in a browser. There's no build step and no dependencies. Inputs are saved in the URL, so you can share a scenario by copying the link.
 
+## On your phone
+
+The app is built to be used on a phone. The price, deposit and stay sliders are pinned to the bottom of the screen. Everything else sits in a panel that slides out from the left: tap **Inputs** or swipe in from the left edge.
+
+It's also an installable web app (a PWA). Once it's hosted over HTTPS (for example on GitHub Pages), open it on your phone and add it to your home screen:
+
+- iPhone (Safari): tap Share, then **Add to Home Screen**.
+- Android (Chrome): open the menu, then **Install app**.
+
+It then opens full screen like a native app and works offline.
+
 ## The break-even graph
 
 The main chart shows house price on the x-axis and the **years you'd need to stay for buying to beat renting** on the y-axis.
