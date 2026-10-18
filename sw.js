@@ -1,6 +1,8 @@
 // Offline support: always try the network first so updates show up straight
-// away, and fall back to the cached copy when offline.
-const CACHE = 'rent-vs-buy-v1';
+// away, and fall back to the cached copy when offline. 'no-cache' makes every
+// request check with the server, so the browser's HTTP cache (GitHub Pages
+// allows 10 minutes) can't hand back an old script next to a new page.
+const CACHE = 'rent-vs-buy-v2';
 const FILES = [
   './', 'index.html', 'styles.css', 'manifest.webmanifest',
   'src/model.js', 'src/chart.js', 'src/app.js', 'src/shell.js',
@@ -20,7 +22,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(caches.open(CACHE).then((cache) =>
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' })
       .then((res) => {
         if (res.ok) cache.put(e.request, res.clone());
         return res;
