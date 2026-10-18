@@ -1,28 +1,12 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { DEFAULTS, monthlyPayment, rateForLtv, simulate, breakEvenPrices } = require('../src/model.js');
-const RATES = require('../data/rates.js');
+const { DEFAULTS, monthlyPayment, simulate, breakEvenPrices } = require('../src/model.js');
 
-const params = (over) => Object.assign({}, DEFAULTS, { mortgageRate: 5 }, over);
+const params = (over) => Object.assign({}, DEFAULTS, over);
 
 test('monthly payment matches the standard annuity formula', () => {
   assert.strictEqual(Math.round(monthlyPayment(270000, 4.5, 25)), 1501);
   assert.strictEqual(monthlyPayment(120000, 0, 10), 1000);
-});
-
-test('rate lookup picks the first loan-to-value band that covers the loan', () => {
-  const bands = [{ maxLtv: 60, rate: 4 }, { maxLtv: 75, rate: 4.5 }, { maxLtv: 95, rate: 5.5 }];
-  assert.strictEqual(rateForLtv(40, bands), 4);
-  assert.strictEqual(rateForLtv(60, bands), 4);
-  assert.strictEqual(rateForLtv(60.1, bands), 4.5);
-  assert.strictEqual(rateForLtv(99, bands), 5.5);
-});
-
-test('the rates snapshot has a sorted set of bands', () => {
-  assert.match(RATES.month, /^\d{4}-\d{2}$/);
-  const ltvs = RATES.bands.map((b) => b.maxLtv);
-  assert.deepStrictEqual(ltvs, ltvs.slice().sort((a, b) => a - b));
-  for (const b of RATES.bands) assert.ok(b.rate > 0 && b.rate < 20);
 });
 
 test('selling immediately loses exactly the buying and selling costs', () => {

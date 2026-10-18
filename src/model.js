@@ -14,7 +14,7 @@
     deposit: 100000,      // £
     depositMin: 60000,    // £ range of deposits you could put down
     depositMax: 135000,
-    mortgageRate: null,   // % per year; null = look up from loan-to-value
+    mortgageRate: 5.1,    // % per year
     mortgageTerm: 35,     // years
     runningCostPct: 1,    // % of price per year: maintenance, insurance, service charge
     rent: 2025,           // £ per month
@@ -26,6 +26,7 @@
     stay: 3,              // years you expect to stay
     stayMin: 1,           // years: range of stays you're considering
     stayMax: 5,
+    chartYears: 15,       // years shown on the break-even chart
   };
 
   function monthlyPayment(principal, annualRatePct, years) {
@@ -36,13 +37,7 @@
     return (principal * r) / (1 - Math.pow(1 + r, -n));
   }
 
-  // bands: [{maxLtv, rate}] sorted by maxLtv. Above the top band uses the top rate.
-  function rateForLtv(ltvPct, bands) {
-    for (const b of bands) if (ltvPct <= b.maxLtv) return b.rate;
-    return bands[bands.length - 1].rate;
-  }
-
-  // Returns one row per month from 0 to `years` * 12. Needs an explicit mortgageRate.
+  // Returns one row per month from 0 to `years` * 12.
   function simulate(p, years) {
     const months = Math.round(years * 12);
     const deposit = Math.min(p.deposit, p.price);
@@ -87,7 +82,8 @@
       let mortgageOut = 0;
       if (m < termMonths && balance > 0) {
         const interest = balance * mRate;
-        mortgageOut = Math.min(payment, balance + interest);
+        // The last payment clears whatever rounding has left over.
+        mortgageOut = m === termMonths - 1 ? balance + interest : Math.min(payment, balance + interest);
         balance = Math.max(0, balance + interest - mortgageOut);
       }
       const owningOut = mortgageOut + running;
@@ -132,7 +128,7 @@
     return out;
   }
 
-  const api = { DEFAULTS, monthlyPayment, rateForLtv, simulate, breakEvenPrices };
+  const api = { DEFAULTS, monthlyPayment, simulate, breakEvenPrices };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.RentVsBuy = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -34,15 +34,23 @@
     return sign + '£' + Math.round(a);
   }
 
+  // null values break the line.
   function linePath(xs, ys, x, y) {
     let d = '';
-    for (let i = 0; i < xs.length; i++) d += (i ? 'L' : 'M') + x(xs[i]).toFixed(1) + ',' + y(ys[i]).toFixed(1);
+    let pen = false;
+    for (let i = 0; i < xs.length; i++) {
+      if (ys[i] == null) { pen = false; continue; }
+      d += (pen ? 'L' : 'M') + x(xs[i]).toFixed(1) + ',' + y(ys[i]).toFixed(1);
+      pen = true;
+    }
     return d;
   }
 
   // opts: {
-  //   xs, xTicks, xFormat(v), xTitle,
-  //   series: [{label, values, cls}], band: {lo, hi}, polarity: bool (shade below zero),
+  //   xs, xTicks, xFormat(v), xTitle, yDomain: [lo, hi], yFormat(v) (default £),
+  //   series: [{label, values, cls}] (null = off the chart), band: {lo, hi},
+  //   polarity: bool (shade below zero), fillBelow: bool (shade under the first series),
+  //   hBand: {lo, hi, label} (horizontal strip),
   //   markers: [{x, label, cls, row}], snap: [index] (hover positions, default all),
   //   tooltip(index) -> {title, rows: [{label, value, cls}]}, focusIndex, ariaLabel }
   function render(container, opts) {
@@ -58,18 +66,20 @@
     const all = opts.series.map((s) => s.values);
     if (opts.band) all.push(opts.band.lo, opts.band.hi);
     for (const arr of all) for (const v of arr) { if (v < lo) lo = v; if (v > hi) hi = v; }
-    const yTicks = niceTicks(lo, hi, 5);
-    const y0 = yTicks[0], y1 = yTicks[yTicks.length - 1];
+    if (opts.yDomain) [lo, hi] = opts.yDomain;
+    const yTicks = niceTicks(lo, hi, 5).filter((t) => !opts.yDomain || (t >= lo && t <= hi));
+    const y0 = opts.yDomain ? lo : yTicks[0], y1 = opts.yDomain ? hi : yTicks[yTicks.length - 1];
+    const yFormat = opts.yFormat || compactGBP;
 
     const x = (v) => M.left + ((v - xMin) / (xMax - xMin)) * w;
-    const y = (v) => M.top + h - ((v - y0) / (y1 - y0)) * h;
+    const y = (v) => M.top + h - ((Math.min(y1, Math.max(y0, v)) - y0) / (y1 - y0)) * h;
 
     const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, width, height, role: 'img', 'aria-label': opts.ariaLabel || '' }, container);
 
     for (const t of yTicks) {
       el('line', { x1: M.left, x2: M.left + w, y1: y(t), y2: y(t), class: t === 0 ? 'axis' : 'grid' }, svg);
       const lab = el('text', { x: M.left - 8, y: y(t), class: 'tick', 'text-anchor': 'end', 'dominant-baseline': 'middle' }, svg);
-      lab.textContent = compactGBP(t);
+      lab.textContent = yFormat(t);
     }
     const minGap = 44;
     let lastX = -Infinity;
@@ -90,10 +100,27 @@
     if (opts.polarity) {
       const zy = y(0);
       el('rect', { x: M.left, y: zy, width: w, height: Math.max(0, M.top + h - zy), class: 'fill-neg' }, svg);
-      const lab = el('text', { x: M.left + w - 8, y: zy + 18, class: 'zone-label', 'text-anchor': 'end' }, svg);
+      const lab = el('text', { x: M.left + 8, y: M.top + h - 8, class: 'zone-label' }, svg);
       lab.textContent = 'Renting wins';
-      const lab2 = el('text', { x: M.left + w - 8, y: zy - 8, class: 'zone-label', 'text-anchor': 'end' }, svg);
+      const lab2 = el('text', { x: M.left + 8, y: zy - 8, class: 'zone-label' }, svg);
       lab2.textContent = 'Buying wins';
+    }
+
+    if (opts.fillBelow) {
+      const vals = opts.series[0].values.map((v) => (v == null ? y1 : v));
+      const area = linePath(xs, vals, x, y) + `L${x(xMax)},${y(y0)}L${x(xMin)},${y(y0)}Z`;
+      el('path', { d: area, class: 'fill-neg' }, svg);
+      const lab = el('text', { x: M.left + w - 8, y: M.top + h - 8, class: 'zone-label', 'text-anchor': 'end' }, svg);
+      lab.textContent = 'Renting wins';
+      const lab2 = el('text', { x: M.left + 8, y: M.top + 14, class: 'zone-label' }, svg);
+      lab2.textContent = 'Buying wins';
+    }
+
+    if (opts.hBand) {
+      const top = y(opts.hBand.hi), bottom = y(opts.hBand.lo);
+      el('rect', { x: M.left, y: top, width: w, height: Math.max(1, bottom - top), class: 'h-band' }, svg);
+      const lab = el('text', { x: M.left + 8, y: top + 14, class: 'marker-label' }, svg);
+      lab.textContent = opts.hBand.label;
     }
 
     for (const m of opts.markers || []) {
@@ -125,8 +152,8 @@
       cross.setAttribute('x1', px); cross.setAttribute('x2', px);
       cross.setAttribute('visibility', 'visible');
       opts.series.forEach((s, j) => {
-        dots[j].setAttribute('cx', px); dots[j].setAttribute('cy', y(s.values[i]));
-        dots[j].setAttribute('visibility', 'visible');
+        dots[j].setAttribute('cx', px); dots[j].setAttribute('cy', y(s.values[i] == null ? y1 : s.values[i]));
+        dots[j].setAttribute('visibility', s.values[i] == null ? 'hidden' : 'visible');
       });
       const t = opts.tooltip(i);
       tip.textContent = '';
