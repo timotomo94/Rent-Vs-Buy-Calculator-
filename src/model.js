@@ -17,7 +17,8 @@
     depositMax: 135000,
     mortgageRate: 5.1,    // % per year
     mortgageTerm: 35,     // years
-    runningCostPct: 1,    // % of price per year: maintenance, insurance, service charge
+    runningCostPct: 1,    // % of price per year: maintenance, insurance
+    leaseCosts: 0,        // £ per year: service charge + ground rent (leasehold)
     rent: 2025,           // £ per month
     monthlySaving: 1000,  // £ per month the renter puts aside on top of rent
     rentGrowth: 4,        // % per year, applied once a year
@@ -25,7 +26,6 @@
     houseGrowth: 0,       // % per year
     buyingCosts: 8000,    // £ one-off: stamp duty, legal, survey, mortgage fees
     sellingCosts: 5000,   // £ one-off when you sell: agent, legal
-    stay: 3,              // years you expect to stay
     stayMin: 1,           // years: range of stays you're considering
     stayMax: 5,
     chartYears: 15,       // years shown on the break-even chart
@@ -46,7 +46,8 @@
     const loan = p.price - deposit;
     const termMonths = Math.round(p.mortgageTerm * 12);
     const payment = monthlyPayment(loan, p.mortgageRate, p.mortgageTerm);
-    const running = (p.price * p.runningCostPct) / 100 / 12;
+    const leasehold = p.leaseCosts / 12;
+    const running = (p.price * p.runningCostPct) / 100 / 12 + leasehold;
     const mRate = p.mortgageRate / 100 / 12;
     const iRate = Math.pow(1 + p.investReturn / 100, 1 / 12) - 1;
 
@@ -101,7 +102,7 @@
       snapshot(m + 1);
     }
 
-    return { deposit, loan, payment, running, buyerSaving: p.rent + p.monthlySaving - payment - running, rows, breakevenMonth: breakeven(rows) };
+    return { deposit, loan, payment, running, leasehold, buyerSaving: p.rent + p.monthlySaving - payment - running, rows, breakevenMonth: breakeven(rows) };
   }
 
   // First month from which buying stays ahead for the rest of the rows,

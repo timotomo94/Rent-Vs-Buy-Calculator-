@@ -32,16 +32,16 @@
     <div class="side">
       <div id="quick" class="panel quick">
         <label class="slider">
-          <span class="row"><span>Price</span><output id="out-price"></output></span>
-          <input name="price" type="range" step="5000" form="inputs">
-        </label>
-        <label class="slider">
           <span class="row"><span>Deposit</span><output id="out-deposit"></output></span>
           <input name="deposit" type="range" step="5000" form="inputs">
         </label>
         <label class="slider">
-          <span class="row"><span>You stay for</span><output id="out-stay"></output></span>
-          <input name="stay" type="range" step="1" form="inputs">
+          <span class="row"><span>Service charge + ground rent</span><output id="out-lease"></output></span>
+          <input name="leaseCosts" type="range" min="0" max="6000" step="100" form="inputs">
+        </label>
+        <label class="slider">
+          <span class="row"><span>Mortgage rate</span><output id="out-rate"></output></span>
+          <input name="mortgageRate" type="range" min="3" max="7" step="0.05" form="inputs">
         </label>
       </div>
 
@@ -54,6 +54,12 @@
         </div>
       <form id="inputs" autocomplete="off" onsubmit="return false">
         <fieldset>
+          <legend>The home you're looking at</legend>
+          <label>Price <span class="field"><i>£</i><input name="price" type="number" min="0" step="5000"></span></label>
+          <p class="hint">Used for the headline, your home's numbers and the month-by-month chart.</p>
+        </fieldset>
+
+        <fieldset>
           <legend>Ranges you're considering</legend>
           <label class="range-row">Price <span class="pair"><span class="field"><i>£</i><input name="priceMin" type="number" min="0" step="10000"></span>–<span class="field"><i>£</i><input name="priceMax" type="number" min="0" step="10000"></span></span></label>
           <label class="range-row">Deposit <span class="pair"><span class="field"><i>£</i><input name="depositMin" type="number" min="0" step="5000"></span>–<span class="field"><i>£</i><input name="depositMax" type="number" min="0" step="5000"></span></span></label>
@@ -63,11 +69,9 @@
 
         <fieldset>
           <legend>Monthly costs</legend>
-          <label>Mortgage rate <span class="field"><input name="mortgageRate" type="number" min="0" step="0.05"><i>% / yr</i></span></label>
-          <p class="hint">Best 2-year fixes in Oct 2026: about 4.9% (60% loan-to-value) to 5.3% (90%).</p>
           <label>Mortgage term <span class="field"><input name="mortgageTerm" type="number" min="1" max="40" step="1"><i>years</i></span></label>
           <label>Running costs <span class="field"><input name="runningCostPct" type="number" min="0" step="0.1"><i>% of price / yr</i></span></label>
-          <p class="hint">Maintenance, insurance, service charge.</p>
+          <p class="hint">Maintenance, insurance. Service charge and ground rent have their own slider.</p>
           <label>Rent <span class="field"><i>£</i><input name="rent" type="number" min="0" step="25"><i>/ month</i></span></label>
           <label>Rent increase <span class="field"><input name="rentGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
           <label>Monthly savings <span class="field"><i>£</i><input name="monthlySaving" type="number" min="0" step="100"><i>/ month</i></span></label>
@@ -155,7 +159,7 @@
           <li>Each month, both have the same budget: rent plus monthly savings. A renter pays rent and invests the savings; a buyer pays the mortgage and running costs and invests what's left. The savings are the same on both sides, so they don't change who wins, only how much each ends up with.</li>
           <li>Selling at any point: buyers get the home's value minus the mortgage left and selling costs, plus their investments. Renters have their investments.</li>
           <li>Break-even is the first month from which buying stays ahead of renting.</li>
-          <li>The mortgage rate is assumed to stay the same for the whole stay.</li>
+          <li>The mortgage rate is assumed to stay the same for the whole stay. Best 2-year fixes in Oct 2026 were about 4.9% (60% loan-to-value) to 5.3% (90%).</li>
           <li>Not included: tax on investment gains (assumes an ISA), inflation, and stamp duty changing with price (buying costs are a fixed amount).</li>
         </ul>
       </details>
