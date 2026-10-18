@@ -30,6 +30,8 @@ The main chart has house price on the x-axis and the time until you sell on the 
 
 Three sliders set the deposit, the yearly service charge + ground rent, and the mortgage rate. The price of the home you're looking at is in the Inputs panel. A second chart follows that home month by month up to the end of your stay range, with a band for house prices growing 2 points a year faster or slower.
 
+At the bottom, **Mortgage repayments and equity** lists, for each year shown on the map, your equity (home value minus mortgage left, before selling costs), how much of the home you own, and how each year's payments split into loan repaid and interest. A repayment mortgage is mostly interest at first, so equity grows slowly early on. The rows inside your stay range are shaded.
+
 ## The model
 
 - Both scenarios start with the same cash: the deposit plus buying costs. The buyer spends it on the house, and the renter invests it.

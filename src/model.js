@@ -56,6 +56,8 @@
     let renterPot = deposit + p.buyingCosts;
     let rentPaid = 0;
     let owningPaid = 0;
+    let mortgagePaid = 0;
+    let interestPaid = 0;
 
     const rows = [];
     const snapshot = (m) => {
@@ -73,6 +75,8 @@
         payoff: buyNet - renterPot,
         rentPaid,
         owningPaid,
+        mortgagePaid,
+        interestPaid,
       });
     };
 
@@ -88,6 +92,7 @@
         // The last payment clears whatever rounding has left over.
         mortgageOut = m === termMonths - 1 ? balance + interest : Math.min(payment, balance + interest);
         balance = Math.max(0, balance + interest - mortgageOut);
+        interestPaid += interest;
       }
       const owningOut = mortgageOut + running;
       const rentOut = p.rent * Math.pow(1 + p.rentGrowth / 100, Math.floor(m / 12));
@@ -98,6 +103,7 @@
       buyerPot += rentOut + p.monthlySaving - owningOut;
 
       owningPaid += owningOut;
+      mortgagePaid += mortgageOut;
       rentPaid += rentOut;
       snapshot(m + 1);
     }

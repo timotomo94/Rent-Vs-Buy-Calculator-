@@ -40,6 +40,13 @@ test('buyer saves rent minus cost of owning plus savings', () => {
   assert.ok(Math.abs(s.buyerSaving - (3000 - s.payment - s.running)) < 1e-9);
 });
 
+test('mortgage payments split into interest and principal', () => {
+  const s = simulate(params({ price: 400000, deposit: 100000, mortgageRate: 5.1 }), 5);
+  const first = s.rows[1];
+  assert.ok(Math.abs(first.interestPaid - 300000 * 0.051 / 12) < 1e-6);
+  for (const r of s.rows) assert.ok(Math.abs(r.mortgagePaid - r.interestPaid - (s.loan - r.balance)) < 1e-6);
+});
+
 test('mortgage is paid off at the end of the term', () => {
   const s = simulate(params({ mortgageTerm: 25 }), 30);
   assert.ok(s.rows[25 * 12].balance < 1e-6);
