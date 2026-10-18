@@ -14,9 +14,11 @@ test('selling immediately loses exactly the buying and selling costs', () => {
   assert.strictEqual(s.rows[0].payoff, -13000);
 });
 
-test('running costs are a percentage of the price', () => {
-  const s = simulate(params({ price: 400000, runningCostPct: 1 }), 1);
-  assert.strictEqual(s.running, 4000 / 12);
+test('running costs are a fixed yearly amount, whatever the price', () => {
+  const cheap = simulate(params({ price: 250000, runningCosts: 3000, leaseCosts: 0 }), 1);
+  const dear = simulate(params({ price: 600000, runningCosts: 3000, leaseCosts: 0 }), 1);
+  assert.strictEqual(cheap.running, 250);
+  assert.strictEqual(dear.running, 250);
 });
 
 test('service charge and ground rent add to the monthly cost of owning', () => {
@@ -54,7 +56,7 @@ test('mortgage is paid off at the end of the term', () => {
 });
 
 test('with no growth, no interest and equal monthly costs, buying never wins back the fees', () => {
-  const s = simulate(params({ houseGrowth: 0, investReturn: 0, mortgageRate: 0, price: 300000, deposit: 300000, runningCostPct: 0, rent: 0 }), 10);
+  const s = simulate(params({ houseGrowth: 0, investReturn: 0, mortgageRate: 0, price: 300000, deposit: 300000, runningCosts: 0, rent: 0 }), 10);
   for (const r of s.rows) assert.strictEqual(Math.round(r.payoff), -13000);
   assert.strictEqual(s.breakevenMonth, null);
 });

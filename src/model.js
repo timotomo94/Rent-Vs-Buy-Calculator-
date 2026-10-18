@@ -17,7 +17,7 @@
     depositMax: 135000,
     mortgageRate: 5.1,    // % per year
     mortgageTerm: 35,     // years
-    runningCostPct: 1,    // % of price per year: maintenance, insurance
+    runningCosts: 4000,   // £ per year: maintenance, insurance
     leaseCosts: 0,        // £ per year: service charge + ground rent (leasehold)
     rent: 2025,           // £ per month
     monthlySaving: 1000,  // £ per month the renter puts aside on top of rent
@@ -47,7 +47,7 @@
     const termMonths = Math.round(p.mortgageTerm * 12);
     const payment = monthlyPayment(loan, p.mortgageRate, p.mortgageTerm);
     const leasehold = p.leaseCosts / 12;
-    const running = (p.price * p.runningCostPct) / 100 / 12 + leasehold;
+    const running = p.runningCosts / 12 + leasehold;
     const mRate = p.mortgageRate / 100 / 12;
     const iRate = Math.pow(1 + p.investReturn / 100, 1 / 12) - 1;
 
