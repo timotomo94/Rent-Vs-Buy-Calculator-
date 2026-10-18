@@ -120,7 +120,7 @@
 
     const owning = base.payment + base.running;
     document.getElementById('stat-owning').textContent = gbp(owning) + ' / month';
-    document.getElementById('stat-owning-split').textContent = `mortgage ${gbp(base.payment)} + upkeep ${gbp(base.running - base.leasehold)}` +
+    document.getElementById('stat-owning-split').textContent = `year 1: mortgage ${gbp(base.payment)} + upkeep ${gbp(base.running - base.leasehold)}` +
       (base.leasehold ? ` + service & ground rent ${gbp(base.leasehold)}` : '');
     document.getElementById('stat-rent').textContent = gbp(p.rent) + ' / month';
     document.getElementById('stat-saving-buy').textContent = gbp(base.buyerSaving) + ' / month';

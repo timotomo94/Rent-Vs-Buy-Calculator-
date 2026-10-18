@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
   <header class="app-bar">
@@ -72,6 +72,8 @@
           <label>Mortgage term <span class="field"><input name="mortgageTerm" type="number" min="1" max="40" step="1"><i>years</i></span></label>
           <label>Running costs <span class="field"><i>£</i><input name="runningCosts" type="number" min="0" step="100"><i>/ yr</i></span></label>
           <p class="hint">Maintenance, insurance. Service charge and ground rent have their own slider.</p>
+          <label>Cost increase <span class="field"><input name="costGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
+          <p class="hint">How fast running costs, service charge and ground rent rise each year.</p>
           <label>Rent <span class="field"><i>£</i><input name="rent" type="number" min="0" step="25"><i>/ month</i></span></label>
           <label>Rent increase <span class="field"><input name="rentGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
           <label>Monthly savings <span class="field"><i>£</i><input name="monthlySaving" type="number" min="0" step="100"><i>/ month</i></span></label>
@@ -179,9 +181,9 @@
     </section>
   </main>
 
-  <script src="src/model.js?v=5"></script>
-  <script src="src/chart.js?v=5"></script>
-  <script src="src/app.js?v=5"></script>
-  <script src="src/shell.js?v=5"></script>
+  <script src="src/model.js?v=6"></script>
+  <script src="src/chart.js?v=6"></script>
+  <script src="src/app.js?v=6"></script>
+  <script src="src/shell.js?v=6"></script>
 </body>
 </html>

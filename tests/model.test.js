@@ -29,6 +29,17 @@ test('service charge and ground rent add to the monthly cost of owning', () => {
   assert.ok(lease.rows[12].payoff < base.rows[12].payoff);
 });
 
+test('running and lease costs rise once a year at their own rate', () => {
+  const s = simulate(params({ runningCosts: 2400, leaseCosts: 1200, costGrowth: 10, rentGrowth: 0, mortgageRate: 0, deposit: 400000, price: 400000 }), 3);
+  const yearCost = (y) => s.rows[y * 12].owningPaid - s.rows[(y - 1) * 12].owningPaid;
+  assert.ok(Math.abs(yearCost(1) - 3600) < 1e-6);
+  assert.ok(Math.abs(yearCost(2) - 3960) < 1e-6);
+  assert.ok(Math.abs(yearCost(3) - 4356) < 1e-6);
+  const flat = simulate(params({ costGrowth: 0 }), 5).rows[60].payoff;
+  const rising = simulate(params({ costGrowth: 4 }), 5).rows[60].payoff;
+  assert.ok(rising < flat);
+});
+
 test('monthly savings change both net worths equally, not the payoff', () => {
   const a = simulate(params({ monthlySaving: 0 }), 5).rows[60];
   const b = simulate(params({ monthlySaving: 1000 }), 5).rows[60];
