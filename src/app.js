@@ -22,7 +22,7 @@
   // form.elements includes the sliders that live outside the form (form="inputs").
   const fields = Array.from(form.elements).filter((el) => el.tagName === 'INPUT' && el.name);
   const field = (name) => form.elements[name];
-  const SLIDERS = { price: ['priceMin', 'priceMax'], deposit: ['depositMin', 'depositMax'], stay: ['stayMin', 'stayMax'] };
+  const SLIDERS = { price: ['priceMin', 'priceMax'], deposit: ['depositMin', 'depositMax'] };
 
   function num(name) {
     const v = parseFloat(field(name).value);
@@ -47,7 +47,6 @@
     }
     p.stayMin = Math.max(1, Math.round(p.stayMin));
     p.stayMax = Math.max(p.stayMin, Math.round(p.stayMax));
-    p.stay = Math.round(p.stay);
     p.chartYears = Math.min(40, Math.max(p.stayMax, Math.round(p.chartYears)));
     return p;
   }
@@ -89,22 +88,24 @@
     // Inputs readouts
     document.getElementById('out-price').textContent = gbp(p.price);
     document.getElementById('out-deposit').textContent = `${gbp(Math.min(p.deposit, p.price))} (${Math.round(100 - ltv)}%)`;
-    document.getElementById('out-stay').textContent = years(p.stay);
+    document.getElementById('out-service').textContent = gbp(p.serviceCharge) + ' / yr';
+    document.getElementById('out-ground').textContent = gbp(p.groundRent) + ' / yr';
 
     // Verdict for the chosen home
     const base = simulate(p, p.chartYears);
-    const atStay = base.rows[p.stay * 12];
+    const atStay = base.rows[p.stayMax * 12];
     const be = base.breakevenMonth;
     document.getElementById('verdict').textContent = be === null
       ? `Renting wins for at least ${years(p.chartYears)}`
       : `Buying breaks even after ${duration(be)}`;
     document.getElementById('verdict-detail').textContent =
-      `For a ${gbp(p.price)} home with a ${gbp(p.deposit)} deposit. If you sell after ${years(p.stay)}, ` +
+      `For a ${gbp(p.price)} home with a ${gbp(p.deposit)} deposit. If you sell after ${years(p.stayMax)}, ` +
       (atStay.payoff >= 0 ? `buying leaves you ${gbp(atStay.payoff)} better off.` : `renting leaves you ${gbp(-atStay.payoff)} better off.`);
 
     const owning = base.payment + base.running;
     document.getElementById('stat-owning').textContent = gbp(owning) + ' / month';
-    document.getElementById('stat-owning-split').textContent = `mortgage ${gbp(base.payment)} + running ${gbp(base.running)}`;
+    document.getElementById('stat-owning-split').textContent = `mortgage ${gbp(base.payment)} + upkeep ${gbp(base.running - base.leasehold)}` +
+      (base.leasehold ? ` + service & ground rent ${gbp(base.leasehold)}` : '');
     document.getElementById('stat-rent').textContent = gbp(p.rent) + ' / month';
     document.getElementById('stat-saving-buy').textContent = gbp(base.buyerSaving) + ' / month';
     document.getElementById('stat-saving-split').textContent = base.buyerSaving < 0
@@ -162,7 +163,6 @@
     tbodyMax.textContent = '';
     for (const r of breakEvenPrices((price) => withPrice(price), stays, p.priceMin, p.priceMax, 1000)) {
       const tr = document.createElement('tr');
-      if (r.years === p.stay) tr.className = 'hl';
       const a = document.createElement('td');
       a.textContent = years(r.years);
       const b = document.createElement('td');
@@ -182,7 +182,7 @@
       `${gbp(p.price)} home, ${gbp(p.deposit)} deposit. The grey band shows house prices growing ${BAND} points a year faster or slower than ${p.houseGrowth}%.`;
     const yearTicks = [];
     for (let t = 0; t <= span; t++) yearTicks.push(t);
-    const timeMarkers = [{ x: p.stay, label: `Your stay: ${years(p.stay)}`, cls: 'stay' }];
+    const timeMarkers = [{ x: p.stayMax, label: `End of your stay: ${years(p.stayMax)}`, cls: 'stay' }];
     if (be) timeMarkers.push({ x: be / 12, label: 'Break-even', cls: 'even', row: 1 });
     render(document.getElementById('time-chart'), {
       xs: rows.map((r) => r.year),
@@ -193,7 +193,7 @@
       band: { lo: low.map((r) => r.payoff), hi: high.map((r) => r.payoff) },
       polarity: true,
       markers: timeMarkers,
-      focusX: p.stay,
+      focusX: p.stayMax,
       ariaLabel: 'Buying advantage over renting for your home, by month you sell',
       tooltip: (i) => {
         const r = rows[i];
@@ -214,7 +214,6 @@
     for (let y = 0; y <= span; y++) {
       const r = rows[y * 12];
       const tr = document.createElement('tr');
-      if (y === p.stay) tr.className = 'hl';
       for (const v of [y, gbp(r.rentPaid), gbp(r.owningPaid), gbp(r.balance), gbp(r.buyNet), gbp(r.rentNet), signed(r.payoff)]) {
         const td = document.createElement('td');
         td.textContent = v;

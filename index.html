@@ -40,8 +40,12 @@
           <input name="deposit" type="range" step="5000" form="inputs">
         </label>
         <label class="slider">
-          <span class="row"><span>You stay for</span><output id="out-stay"></output></span>
-          <input name="stay" type="range" step="1" form="inputs">
+          <span class="row"><span>Service charge</span><output id="out-service"></output></span>
+          <input name="serviceCharge" type="range" min="0" max="6000" step="100" form="inputs">
+        </label>
+        <label class="slider">
+          <span class="row"><span>Ground rent</span><output id="out-ground"></output></span>
+          <input name="groundRent" type="range" min="0" max="1000" step="25" form="inputs">
         </label>
       </div>
 
@@ -67,7 +71,7 @@
           <p class="hint">Best 2-year fixes in Oct 2026: about 4.9% (60% loan-to-value) to 5.3% (90%).</p>
           <label>Mortgage term <span class="field"><input name="mortgageTerm" type="number" min="1" max="40" step="1"><i>years</i></span></label>
           <label>Running costs <span class="field"><input name="runningCostPct" type="number" min="0" step="0.1"><i>% of price / yr</i></span></label>
-          <p class="hint">Maintenance, insurance, service charge.</p>
+          <p class="hint">Maintenance, insurance. Service charge and ground rent have their own sliders.</p>
           <label>Rent <span class="field"><i>£</i><input name="rent" type="number" min="0" step="25"><i>/ month</i></span></label>
           <label>Rent increase <span class="field"><input name="rentGrowth" type="number" step="0.5"><i>% / yr</i></span></label>
           <label>Monthly savings <span class="field"><i>£</i><input name="monthlySaving" type="number" min="0" step="100"><i>/ month</i></span></label>
