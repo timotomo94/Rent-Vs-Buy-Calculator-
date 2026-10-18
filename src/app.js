@@ -2,7 +2,8 @@
   'use strict';
 
   const { DEFAULTS, simulate, breakEvenPrices } = window.RentVsBuy;
-  const { render } = window.LineChart;
+  const { render, renderHeatmap, divergingColor, heatColors } = window.LineChart;
+  const HEAT_SCALE = 50000; // £ at which the heatmap colours are at their strongest
   const BAND = 2; // ± percentage points of house price growth for the "what if" band
 
   const gbp = (v) => (v < 0 ? '−' : '') + '£' + Math.round(Math.abs(v)).toLocaleString('en-GB');
@@ -16,6 +17,28 @@
     if (y) parts.push(years(y));
     if (m) parts.push(m + (m === 1 ? ' month' : ' months'));
     return parts.join(' ') || 'straight away';
+  }
+
+  // Colour key for the break-even map: renting ahead ← even → buying ahead.
+  function renderLegend(container) {
+    const colors = heatColors();
+    const stops = [];
+    for (let i = 0; i <= 20; i++) {
+      const v = HEAT_SCALE * (i / 10 - 1);
+      stops.push(`rgb(${divergingColor(v, HEAT_SCALE, colors).join(',')}) ${i * 5}%`);
+    }
+    container.textContent = '';
+    const bar = document.createElement('div');
+    bar.className = 'heat-bar';
+    bar.style.background = `linear-gradient(to right, ${stops.join(', ')})`;
+    const labels = document.createElement('div');
+    labels.className = 'heat-labels';
+    for (const text of [`Renting ahead ${kGBP(HEAT_SCALE)}+`, 'Even', `Buying ahead ${kGBP(HEAT_SCALE)}+`]) {
+      const span = document.createElement('span');
+      span.textContent = text;
+      labels.appendChild(span);
+    }
+    container.append(bar, labels);
   }
 
   const form = document.getElementById('inputs');
@@ -71,12 +94,6 @@
     history.replaceState(null, '', s ? '?' + s : location.pathname);
   }
 
-  // Years until buying stays ahead, or null if not within `horizon` years.
-  function breakEvenYears(params, horizon) {
-    const m = simulate(params, horizon).breakevenMonth;
-    return m === null ? null : m / 12;
-  }
-
   function update() {
     const p = readInputs();
     toURL(p);
@@ -114,45 +131,49 @@
     document.getElementById('stat-ltv').textContent = Math.round(ltv) + '%';
     document.getElementById('stat-cash').textContent = gbp(base.deposit + p.buyingCosts);
 
-    // Break-even chart: years needed against house price
+    // Break-even map: how far ahead buying is, for every price and month you might sell
     const prices = [];
     for (let x = p.priceMin; x < p.priceMax; x += 5000) prices.push(x);
     prices.push(p.priceMax);
-    const curve = prices.map((price) => breakEvenYears(withPrice(price), p.chartYears));
-    const depLo = prices.map((price) => breakEvenYears(withPrice(price, p.depositMin), p.chartYears));
-    const depHi = prices.map((price) => breakEvenYears(withPrice(price, p.depositMax), p.chartYears));
-    const cap = (v) => (v == null ? p.chartYears : v);
+    const sims = prices.map((price) => simulate(withPrice(price), p.chartYears));
+    const grid = sims.map((s) => s.rows.map((r) => r.payoff));
+    const curve = sims.map((s) => (s.breakevenMonth === null ? null : s.breakevenMonth / 12));
 
     document.getElementById('breakeven-sub').textContent =
-      `With a ${kGBP(p.deposit)} deposit (grey: ${kGBP(p.depositMin)}–${kGBP(p.depositMax)}). ` +
-      'Buying works where the line runs through or below your stay.';
+      `How far ahead buying leaves you, by price and when you sell (${kGBP(p.deposit)} deposit). ` +
+      'The line is break-even. Tap anywhere for the amount.';
+    renderLegend(document.getElementById('heat-legend'));
 
     const tickStep = p.priceMax - p.priceMin > 400000 ? 100000 : 50000;
     const xTicks = [];
     for (let t = Math.ceil(p.priceMin / tickStep) * tickStep; t <= p.priceMax; t += tickStep) xTicks.push(t);
-    const fmtYears = (v) => (v == null ? `more than ${years(p.chartYears)}` : duration(Math.round(v * 12)));
-    render(document.getElementById('breakeven-chart'), {
+    const hLines = p.stayMin === p.stayMax
+      ? [{ y: p.stayMax, label: `Your stay: ${years(p.stayMax)}` }]
+      : [{ y: p.stayMin }, { y: p.stayMax, label: `Your stay: ${p.stayMin}–${p.stayMax} years` }];
+    renderHeatmap(document.getElementById('breakeven-chart'), {
       xs: prices,
+      months: p.chartYears * 12,
+      years: p.chartYears,
+      grid,
+      scale: HEAT_SCALE,
+      curve,
       xTicks,
       xFormat: kGBP,
       xTitle: 'House price',
-      yDomain: [0, p.chartYears],
-      yFormat: (v) => (v === 0 ? '0' : v + 'y'),
-      series: [{ label: 'Years to break even', values: curve, cls: 's-payoff' }],
-      band: { lo: depLo.map((v, i) => Math.min(cap(v), cap(depHi[i]))), hi: depLo.map((v, i) => Math.max(cap(v), cap(depHi[i]))) },
-      fillBelow: true,
-      hBand: { lo: p.stayMin, hi: p.stayMax, label: p.stayMin === p.stayMax ? `Your stay: ${years(p.stayMin)}` : `Your stay: ${p.stayMin}–${p.stayMax} years` },
-      markers: [{ x: p.price, label: 'Your home', cls: 'stay', bottom: true }],
-      focusX: p.price,
-      ariaLabel: 'Years needed to break even by house price',
-      tooltip: (i) => ({
-        title: gbp(prices[i]) + ' home',
-        rows: [
-          { label: `with ${kGBP(p.deposit)} deposit`, value: fmtYears(curve[i]), cls: 's-payoff' },
-          { label: `with ${kGBP(p.depositMin)}`, value: fmtYears(depLo[i]), cls: 'band-key' },
-          { label: `with ${kGBP(p.depositMax)}`, value: fmtYears(depHi[i]), cls: 'band-key' },
-        ],
-      }),
+      hLines,
+      markers: [{ x: p.price, label: 'Your home' }],
+      focus: { x: p.price, month: p.stayMax * 12 },
+      ariaLabel: 'How much better off buying leaves you by house price and years until you sell, with the break-even line',
+      tooltip: (c, m, color) => {
+        const v = grid[c][m];
+        return {
+          title: `${gbp(prices[c])} home, sell ${m === 0 ? 'immediately' : 'after ' + duration(m)}`,
+          rows: [
+            { label: v >= 0 ? 'buying ahead' : 'renting ahead', value: gbp(Math.abs(v)), cls: 'swatch', color },
+            { label: 'break-even', value: curve[c] == null ? `over ${years(p.chartYears)}` : duration(Math.round(curve[c] * 12)), cls: 's-payoff' },
+          ],
+        };
+      },
     });
 
     // Most you should pay
@@ -227,5 +248,7 @@
   document.getElementById('reset').addEventListener('click', () => { writeInputs(DEFAULTS); update(); });
   let t;
   window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(update, 100); });
+  // The heatmap colours come from CSS, so redraw when the colour scheme flips.
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', update);
   update();
 })();

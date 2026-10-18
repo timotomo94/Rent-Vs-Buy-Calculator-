@@ -15,14 +15,18 @@ It's also an installable web app (a PWA). Once it's hosted over HTTPS (for examp
 
 It then opens full screen like a native app and works offline.
 
-## The break-even graph
+## The break-even map
 
-The main chart shows house price on the x-axis and the **years you'd need to stay for buying to beat renting** on the y-axis.
+The main chart has house price on the x-axis and the time until you sell on the y-axis. Every point is coloured by how much better off buying leaves you than renting:
 
-- Under the curve (red), you'd sell before buying catches up, so renting wins. Above it, buying wins.
-- The blue strip is the range of years you expect to stay (1–5 by default). Wherever the curve runs through or below it, buying works for you.
-- The grey band shows the same curve across your deposit range. The deposit makes little difference.
-- The "Most you should pay" table reads the curve for each whole year of stay.
+- **Blue:** buying ahead.
+- **Red:** renting ahead.
+- **Pale:** about even.
+- The colours are strongest at £50k either way.
+
+- The black line is the **break-even**: for each price, how long you'd need to stay for buying to catch up. Below it renting wins; above it buying wins.
+- The two horizontal lines mark the range of years you expect to stay (1–5 by default), and the vertical line marks the home you're looking at.
+- Tap or hover anywhere for the exact amount and that price's break-even. The "Most you should pay" table reads the line for each whole year of stay.
 
 Three sliders set the deposit, the yearly service charge + ground rent, and the mortgage rate. The price of the home you're looking at is in the Inputs panel. A second chart follows that home month by month up to the end of your stay range, with a band for house prices growing 2 points a year faster or slower.
 
