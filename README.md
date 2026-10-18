@@ -35,6 +35,10 @@ Three sliders set the deposit, the yearly service charge + ground rent, and the 
 - The mortgage rate is an input and is assumed to stay the same for the whole stay.
 - Not modelled: tax on investment gains (assumes an ISA), inflation, and stamp duty varying with price (buying costs are a fixed amount).
 
+## Releasing a change
+
+When you change any file the page loads, bump the `?v=` number on the stylesheet and script links in `index.html` and the `CACHE` name in `sw.js`. Phones that already have the app then fetch every new file together, instead of mixing a cached old script with the new page.
+
 ## Tests
 
 ```
