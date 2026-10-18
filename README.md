@@ -35,7 +35,7 @@ At the bottom, **Mortgage repayments and equity** lists, for each year shown on 
 ## The model
 
 - Both scenarios start with the same cash: the deposit plus buying costs. The buyer spends it on the house, and the renter invests it.
-- Each month, both have the same budget: rent plus monthly savings (£1,000 by default). The renter pays rent and invests the savings. The buyer pays the mortgage plus running costs (maintenance and insurance as a % of price, plus service charge and ground rent) and invests what's left. The savings are equal on both sides, so they change how much each ends up with but not who wins.
+- Each month, both have the same budget: rent plus monthly savings (£1,000 by default). The renter pays rent and invests the savings. The buyer pays the mortgage plus running costs (maintenance and insurance as a fixed £ a year, plus service charge and ground rent, all rising once a year at their own rate, like rent does) and invests what's left. The savings are equal on both sides, so they change how much each ends up with but not who wins.
 - At sale, the buyer gets home value minus the mortgage left and selling costs, plus their investments. The renter has their investments.
 - Break-even is the first month from which buying stays ahead.
 - The mortgage rate is an input and is assumed to stay the same for the whole stay.

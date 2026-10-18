@@ -14,9 +14,11 @@ test('selling immediately loses exactly the buying and selling costs', () => {
   assert.strictEqual(s.rows[0].payoff, -13000);
 });
 
-test('running costs are a percentage of the price', () => {
-  const s = simulate(params({ price: 400000, runningCostPct: 1 }), 1);
-  assert.strictEqual(s.running, 4000 / 12);
+test('running costs are a fixed yearly amount, whatever the price', () => {
+  const cheap = simulate(params({ price: 250000, runningCosts: 3000, leaseCosts: 0 }), 1);
+  const dear = simulate(params({ price: 600000, runningCosts: 3000, leaseCosts: 0 }), 1);
+  assert.strictEqual(cheap.running, 250);
+  assert.strictEqual(dear.running, 250);
 });
 
 test('service charge and ground rent add to the monthly cost of owning', () => {
@@ -25,6 +27,17 @@ test('service charge and ground rent add to the monthly cost of owning', () => {
   assert.strictEqual(lease.leasehold, 225);
   assert.ok(Math.abs(lease.running - base.running - 225) < 1e-9);
   assert.ok(lease.rows[12].payoff < base.rows[12].payoff);
+});
+
+test('running and lease costs rise once a year at their own rate', () => {
+  const s = simulate(params({ runningCosts: 2400, leaseCosts: 1200, costGrowth: 10, rentGrowth: 0, mortgageRate: 0, deposit: 400000, price: 400000 }), 3);
+  const yearCost = (y) => s.rows[y * 12].owningPaid - s.rows[(y - 1) * 12].owningPaid;
+  assert.ok(Math.abs(yearCost(1) - 3600) < 1e-6);
+  assert.ok(Math.abs(yearCost(2) - 3960) < 1e-6);
+  assert.ok(Math.abs(yearCost(3) - 4356) < 1e-6);
+  const flat = simulate(params({ costGrowth: 0 }), 5).rows[60].payoff;
+  const rising = simulate(params({ costGrowth: 4 }), 5).rows[60].payoff;
+  assert.ok(rising < flat);
 });
 
 test('monthly savings change both net worths equally, not the payoff', () => {
@@ -54,7 +67,7 @@ test('mortgage is paid off at the end of the term', () => {
 });
 
 test('with no growth, no interest and equal monthly costs, buying never wins back the fees', () => {
-  const s = simulate(params({ houseGrowth: 0, investReturn: 0, mortgageRate: 0, price: 300000, deposit: 300000, runningCostPct: 0, rent: 0 }), 10);
+  const s = simulate(params({ houseGrowth: 0, investReturn: 0, mortgageRate: 0, price: 300000, deposit: 300000, runningCosts: 0, rent: 0 }), 10);
   for (const r of s.rows) assert.strictEqual(Math.round(r.payoff), -13000);
   assert.strictEqual(s.breakevenMonth, null);
 });
