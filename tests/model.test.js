@@ -20,8 +20,8 @@ test('running costs are a percentage of the price', () => {
 });
 
 test('service charge and ground rent add to the monthly cost of owning', () => {
-  const base = simulate(params({ serviceCharge: 0, groundRent: 0 }), 1);
-  const lease = simulate(params({ serviceCharge: 2400, groundRent: 300 }), 1);
+  const base = simulate(params({ leaseCosts: 0 }), 1);
+  const lease = simulate(params({ leaseCosts: 2700 }), 1);
   assert.strictEqual(lease.leasehold, 225);
   assert.ok(Math.abs(lease.running - base.running - 225) < 1e-9);
   assert.ok(lease.rows[12].payoff < base.rows[12].payoff);

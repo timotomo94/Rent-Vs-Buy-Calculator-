@@ -6,7 +6,7 @@ Open `index.html` in a browser. There's no build step and no dependencies. Input
 
 ## On your phone
 
-The app is built to be used on a phone. The price, deposit, service charge and ground rent sliders are pinned to the bottom of the screen. Everything else sits in a panel that slides out from the left: tap **Inputs** or swipe in from the left edge.
+The app is built to be used on a phone. The deposit, service charge + ground rent, and mortgage rate sliders are pinned to the bottom of the screen. Everything else sits in a panel that slides out from the left: tap **Inputs** or swipe in from the left edge.
 
 It's also an installable web app (a PWA). Once it's hosted over HTTPS (for example on GitHub Pages), open it on your phone and add it to your home screen:
 
@@ -24,7 +24,7 @@ The main chart shows house price on the x-axis and the **years you'd need to sta
 - The grey band shows the same curve across your deposit range. The deposit makes little difference.
 - The "Most you should pay" table reads the curve for each whole year of stay.
 
-You set the home you're looking at with four sliders: price, deposit, service charge and ground rent. A second chart follows that home month by month up to the end of your stay range, with a band for house prices growing 2 points a year faster or slower.
+Three sliders set the deposit, the yearly service charge + ground rent, and the mortgage rate. The price of the home you're looking at is in the Inputs panel. A second chart follows that home month by month up to the end of your stay range, with a band for house prices growing 2 points a year faster or slower.
 
 ## The model
 

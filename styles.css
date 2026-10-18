@@ -211,7 +211,7 @@ code { font-size: 13px; }
   .app-bar h1 { font-size: 18px; }
   .app-bar p { display: none; }
   #open-drawer { display: inline-flex; }
-  .layout { padding-top: 12px; padding-bottom: 230px; gap: 12px; }
+  .layout { padding-top: 12px; padding-bottom: 200px; gap: 12px; }
   .results { gap: 12px; }
   .results .panel { padding: 12px 14px; }
   .side { position: static; max-height: none; overflow: visible; display: block; }

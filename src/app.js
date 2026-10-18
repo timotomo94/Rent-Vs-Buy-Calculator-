@@ -22,7 +22,7 @@
   // form.elements includes the sliders that live outside the form (form="inputs").
   const fields = Array.from(form.elements).filter((el) => el.tagName === 'INPUT' && el.name);
   const field = (name) => form.elements[name];
-  const SLIDERS = { price: ['priceMin', 'priceMax'], deposit: ['depositMin', 'depositMax'] };
+  const SLIDERS = { deposit: ['depositMin', 'depositMax'] };
 
   function num(name) {
     const v = parseFloat(field(name).value);
@@ -86,10 +86,9 @@
     const ltv = (Math.max(0, p.price - p.deposit) / p.price) * 100;
 
     // Inputs readouts
-    document.getElementById('out-price').textContent = gbp(p.price);
     document.getElementById('out-deposit').textContent = `${gbp(Math.min(p.deposit, p.price))} (${Math.round(100 - ltv)}%)`;
-    document.getElementById('out-service').textContent = gbp(p.serviceCharge) + ' / yr';
-    document.getElementById('out-ground').textContent = gbp(p.groundRent) + ' / yr';
+    document.getElementById('out-lease').textContent = gbp(p.leaseCosts) + ' / yr';
+    document.getElementById('out-rate').textContent = p.mortgageRate.toFixed(2) + '%';
 
     // Verdict for the chosen home
     const base = simulate(p, p.chartYears);
