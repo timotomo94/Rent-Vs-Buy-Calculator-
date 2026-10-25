@@ -17,8 +17,9 @@
     depositMax: 135000,
     mortgageRate: 5.1,    // % per year
     mortgageTerm: 35,     // years
-    runningCostPct: 1,    // % of price per year: maintenance, insurance
+    runningCosts: 4000,   // £ per year: maintenance, insurance
     leaseCosts: 0,        // £ per year: service charge + ground rent (leasehold)
+    costGrowth: 4,        // % per year rise in running costs and lease costs, applied once a year
     rent: 2025,           // £ per month
     monthlySaving: 1000,  // £ per month the renter puts aside on top of rent
     rentGrowth: 4,        // % per year, applied once a year
@@ -47,7 +48,7 @@
     const termMonths = Math.round(p.mortgageTerm * 12);
     const payment = monthlyPayment(loan, p.mortgageRate, p.mortgageTerm);
     const leasehold = p.leaseCosts / 12;
-    const running = (p.price * p.runningCostPct) / 100 / 12 + leasehold;
+    const running = p.runningCosts / 12 + leasehold;
     const mRate = p.mortgageRate / 100 / 12;
     const iRate = Math.pow(1 + p.investReturn / 100, 1 / 12) - 1;
 
@@ -94,7 +95,7 @@
         balance = Math.max(0, balance + interest - mortgageOut);
         interestPaid += interest;
       }
-      const owningOut = mortgageOut + running;
+      const owningOut = mortgageOut + running * Math.pow(1 + p.costGrowth / 100, Math.floor(m / 12));
       const rentOut = p.rent * Math.pow(1 + p.rentGrowth / 100, Math.floor(m / 12));
 
       // Same budget either way. The buyer's savings go negative if owning costs
